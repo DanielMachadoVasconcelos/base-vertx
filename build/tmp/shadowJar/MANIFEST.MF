@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Verticle: br.ead.home.vertx.Application
+Main-Class: io.vertx.core.Launcher
+
