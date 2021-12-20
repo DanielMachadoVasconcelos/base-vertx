@@ -1,32 +1,50 @@
 package br.ead.home.vertx;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import br.ead.home.vertx.configuration.ConfigurationLoader;
+import br.ead.home.vertx.persistance.migration.FlywayMigration;
+import br.ead.home.vertx.verticles.RestApiVerticle;
+import br.ead.home.vertx.verticles.VersionInfoVerticle;
+import io.vertx.core.*;
 import lombok.extern.slf4j.Slf4j;
-import br.ead.home.vertx.services.TemperatureSensor;
-import br.ead.home.vertx.utils.EventBusAddresses;
 
 @Slf4j
 public class Application extends AbstractVerticle {
 
+    public static void main(String[] args) {
+        var vertx = Vertx.vertx();
+        vertx.exceptionHandler(error -> log.error("Unhandled error: {}", error.getMessage(), error));
+        vertx.deployVerticle(new Application())
+                .onFailure(error -> log.error("Failed to deploy:", error))
+                .onSuccess(id -> log.info("Deployed {} with id {}", Application.class.getSimpleName(), id));
+    }
+
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
-        vertx.createHttpServer()
-                .requestHandler(req -> req.response()
-                        .putHeader("content-type", "text/plain")
-                        .end("Hello World!"))
-                .listen(8888)
-                .onSuccess(http -> {
-                    startPromise.complete();
-                    log.info("HTTP server started on port 8888");
-                }).onFailure(error -> {
-                    startPromise.fail(error.getCause());
-                    log.error("Failed to start HTTP server!", error);
-                });
+        vertx.deployVerticle(VersionInfoVerticle.class.getName())
+                .onFailure(startPromise::fail)
+                .onSuccess(id -> log.info("Deployed {} with id {}", VersionInfoVerticle.class.getSimpleName(), id))
+                .compose(next -> migrateDatabase())
+                .onFailure(startPromise::fail)
+                .onSuccess(id -> log.info("Migrated db schema to latest version!"))
+                .compose(next -> deployRestApiVerticle(startPromise));
+    }
 
-        vertx.deployVerticle(new TemperatureSensor());
-        vertx.eventBus().consumer(EventBusAddresses.TEMPERATURES,
-                message -> log.info("Current Temperature: " + message.body()));
+    private Future<Void> migrateDatabase() {
+        return ConfigurationLoader.load(vertx)
+                .compose(config -> FlywayMigration.migrate(vertx, config.getDatabaseConfiguration()));
+    }
+
+    private Future<String> deployRestApiVerticle(final Promise<Void> startPromise) {
+        DeploymentOptions deploymentOptions = new DeploymentOptions().setInstances(halfProcessors());
+        return vertx.deployVerticle(RestApiVerticle.class.getName(), deploymentOptions)
+                .onFailure(startPromise::fail)
+                .onSuccess(id -> {
+                    log.info("Deployed {} with id {}", RestApiVerticle.class.getSimpleName(), id);
+                    startPromise.complete();
+                });
+    }
+
+    private int halfProcessors() {
+        return Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
     }
 }

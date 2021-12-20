@@ -1,0 +1,6 @@
+version: "1.0"
+
+db:
+  password: pgpass
+  user: postgres
+  database:
