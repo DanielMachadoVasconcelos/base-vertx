@@ -19,7 +19,6 @@ public class FlywayMigration {
     public static Future<Void> migrate(final Vertx vertx, final DatabaseConfiguration dbConfig) {
         log.debug("DB Config: {}", dbConfig);
         return vertx.<Void>executeBlocking(promise -> {
-            // Flyway migration is blocking => uses JDBC
             execute(dbConfig);
             promise.complete();
         }).onFailure(err -> log.error("Failed to migrate db schema with error: ", err));
@@ -27,7 +26,6 @@ public class FlywayMigration {
 
     private static void execute(final DatabaseConfiguration dbConfig) {
         var database = "postgresql";
-        //var database = "mysql";
         final String jdbcUrl = String.format("jdbc:%s://%s:%d/%s",
                 database,
                 dbConfig.getHost(),
@@ -36,7 +34,6 @@ public class FlywayMigration {
         );
 
         log.debug("Migrating DB schema using jdbc url: {}", jdbcUrl);
-
         final Flyway flyway = Flyway.configure()
                 .dataSource(jdbcUrl, dbConfig.getUser(), dbConfig.getPassword())
                 .schemas("broker")

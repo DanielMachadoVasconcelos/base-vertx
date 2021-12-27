@@ -7,20 +7,18 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@AllArgsConstructor
 public class GetAssetsHandler implements Handler<RoutingContext> {
 
-    private final Pool db;
-
-    public GetAssetsHandler(final Pool db) {
-        this.db = db;
-    }
+    private final Pool database;
 
     @Override
     public void handle(final RoutingContext context) {
-        db.query("SELECT a.value FROM broker.assets a")
+        database.query("SELECT a.value FROM broker.assets a")
                 .execute()
                 .onFailure(DataBaseResponseHandler.errorHandler(context, "Failed to get assets from database!"))
                 .onSuccess(result -> {

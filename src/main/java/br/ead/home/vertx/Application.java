@@ -19,7 +19,7 @@ public class Application extends AbstractVerticle {
     }
 
     @Override
-    public void start(Promise<Void> startPromise) throws Exception {
+    public void start(Promise<Void> startPromise) {
         vertx.deployVerticle(VersionInfoVerticle.class.getName())
                 .onFailure(startPromise::fail)
                 .onSuccess(id -> log.info("Deployed {} with id {}", VersionInfoVerticle.class.getSimpleName(), id))

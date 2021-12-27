@@ -3,17 +3,17 @@ version: '3.7'
 services:
   db:
     image: postgres:13.1-alpine
-    container_name: da
+    container_name: database
     environment:
       # Create db
-      POSTGRES_DB: 'vertx-stock-broker'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'pgpass'
+      POSTGRES_DB: 'broker'
+      POSTGRES_USER: 'username'
+      POSTGRES_PASSWORD: 'password'
       TZ: UTC
     volumes:
       - vertx-stock-broker-data-local:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
 
   pgadmin:
     container_name: pgadmin4

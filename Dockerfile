@@ -1,6 +1,6 @@
 # Docker example using fatjar
-# - docker build -t br/ead/home/temperatures-sensor .
-# - docker run -t -i -p 8888:8888 br/ead/home/temperatures-sensor
+# - docker build -t br/ead/home/stock-broker .
+# - docker run -t -i -p 8888:8888 br/ead/home/stock-broker
 
 # https://hub.docker.com/_/adoptopenjdk
 #FROM adoptopenjdk:11-jre-hotspot
@@ -8,7 +8,7 @@
 # Alternative https://hub.docker.com/_/amazoncorretto
 FROM amazoncorretto:17-alpine-jdk
 
-ENV FAT_JAR temperature-sensor-1.0-SNAPSHOT-fat.jar
+ENV FAT_JAR stock-broker-1.0-SNAPSHOT-fat.jar
 ENV APP_HOME /usr/app
 
 EXPOSE 8888
