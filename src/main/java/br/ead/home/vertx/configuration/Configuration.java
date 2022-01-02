@@ -1,13 +1,12 @@
 package br.ead.home.vertx.configuration;
 
-import java.util.Objects;
-
+import com.google.common.base.Preconditions;
 import io.vertx.core.json.JsonObject;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 
-import static br.ead.home.vertx.configuration.ConfigurationLoader.*;
+import static br.ead.home.vertx.configuration.EnvironmentConfiguration.*;
 
 @Builder
 @Value
@@ -19,30 +18,41 @@ public class Configuration {
     DatabaseConfiguration databaseConfiguration;
 
     public static Configuration from(final JsonObject config) {
-        final Integer serverPort = config.getInteger(SERVER_PORT);
-        if (Objects.isNull(serverPort)) {
-            throw new RuntimeException(SERVER_PORT + " not configured!");
-        }
-        
-        final String version = config.getString("version");
-        if (Objects.isNull(version)) {
-            throw new RuntimeException("version is not configured in config file!");
-        }
-        
+        var serverPort = SERVER_PORT.extract(config);
+        var version = VERSION.extract(config);
+
+        Preconditions.checkNotNull(serverPort, "server port is not configured in configuration file!");
+        Preconditions.checkNotNull(version, "version is not configured in config file!");
+
         return Configuration.builder()
-                .serverPort(serverPort)
+                .serverPort(Integer.valueOf(serverPort))
                 .version(version)
                 .databaseConfiguration(parseDbConfig(config))
                 .build();
     }
 
     private static DatabaseConfiguration parseDbConfig(final JsonObject config) {
+        var dbConfiguration = config.getJsonObject("db");
+
+        var port = DB_PORT.extract(config);
+        var host = DB_HOST.extract(config);
+        var database = DB_DATABASE.extract(config);
+        var user = DB_USER.extract(config);
+        var password = DB_HOST.extract(config);
+
+        Preconditions.checkNotNull(dbConfiguration, "database is not configured in configuration file!");
+        Preconditions.checkNotNull(password, "database password is not configured in configuration file!");
+        Preconditions.checkNotNull(user, "database user is not configured in configuration file!");
+        Preconditions.checkNotNull(database, "database is not configured in configuration file!");
+        Preconditions.checkNotNull(host, "database host is not configured in configuration file!");
+        Preconditions.checkNotNull(port, "database port is not configured in configuration file!");
+
         return DatabaseConfiguration.builder()
-                .host(config.getString(DB_HOST))
-                .port(config.getInteger(DB_PORT))
-                .database(config.getString(DB_DATABASE))
-                .user(config.getString(DB_USER))
-                .password(config.getString(DB_PASSWORD))
+                .host(host)
+                .port(Integer.valueOf(port))
+                .database(database)
+                .user(user)
+                .password(password)
                 .build();
     }
 }

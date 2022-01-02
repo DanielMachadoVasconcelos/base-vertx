@@ -1,11 +1,11 @@
-//import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id 'java'
     id 'application'
     id "com.github.johnrengelman.shadow" version "7.0.0"
     id "com.avast.gradle.docker-compose" version "0.14.9"
-//    id 'com.google.cloud.tools.jib' version '3.1.4'
+    id 'com.google.cloud.tools.jib' version '3.1.4'
 }
 
 group 'br.ead.home.vertx'
@@ -20,23 +20,33 @@ repositories {
     mavenCentral()
 }
 
+dockerCompose.isRequiredBy(test)
+
+dockerCompose {
+    projectName = project.name
+    projectNamePrefix  = 'docker-compose'
+    stopContainers = true
+    removeContainers = true
+    removeOrphans = true
+}
+
 application {
     mainClass.set(launcherClassName)
 }
 
-//jib {
-//    from {
-//        image = 'amazoncorretto:17-alpine-jdk'
-//    }
-//    to {
-//        image = "br/ead/home/stock-broker"
-//    }
-//    container {
-//        mainClass = "io.vertx.core.Launcher"
-//        args = ["run", mainVerticleName]
-//        ports = ["8888"]
-//    }
-//}
+jib {
+    from {
+        image = 'amazoncorretto:17-alpine-jdk'
+    }
+    to {
+        image = "br/ead/home/stock-broker"
+    }
+    container {
+        mainClass = "io.vertx.core.Launcher"
+        args = ["run", mainVerticleName]
+        ports = ["8888"]
+    }
+}
 
 configurations {
     compileOnly {
@@ -61,6 +71,8 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-core:2.14.1"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.14.1"
 
+    implementation "com.google.guava:guava:30.1.1-jre"
+
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
@@ -78,15 +90,15 @@ test {
     }
 }
 
-//tasks.withType ShadowJar, {
-//    archiveClassifier.set("fat")
-//    manifest {
-//        attributes(Map.of("Main-Verticle", mainVerticleName))
-//    }
-//    mergeServiceFiles {
-//        include("META-INF/br.ead.home.vertx.services/io.vertx.core.spi.VerticleFactory")
-//    }
-//}
+tasks.withType ShadowJar, {
+    archiveClassifier.set("fat")
+    manifest {
+        attributes(Map.of("Main-Verticle", mainVerticleName))
+    }
+    mergeServiceFiles {
+        include("META-INF/br.ead.home.vertx.services/io.vertx.core.spi.VerticleFactory")
+    }
+}
 
 tasks.withType JavaExec, {
     args = ["run", mainVerticleName, "--redeploy=$watchForChange", "--launcher-class=$launcherClassName", "--on-redeploy=$doOnChange"]

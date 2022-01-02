@@ -1,11 +1,12 @@
 package br.ead.home.vertx;
 
-import br.ead.home.vertx.configuration.ConfigurationLoader;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxTestContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static br.ead.home.vertx.configuration.EnvironmentConfiguration.*;
 
 public abstract class AbstractRestApiTest {
 
@@ -14,12 +15,12 @@ public abstract class AbstractRestApiTest {
 
     @BeforeEach
     void deploy_verticle(Vertx vertx, VertxTestContext context) {
-        System.setProperty(ConfigurationLoader.SERVER_PORT, String.valueOf(TEST_SERVER_PORT));
-        System.setProperty(ConfigurationLoader.DB_HOST, "localhost");
-        System.setProperty(ConfigurationLoader.DB_PORT, "5432");
-        System.setProperty(ConfigurationLoader.DB_DATABASE, "broker");
-        System.setProperty(ConfigurationLoader.DB_USER, "username");
-        System.setProperty(ConfigurationLoader.DB_PASSWORD, "password");
+        System.setProperty(SERVER_PORT.getEnvironment(), String.valueOf(TEST_SERVER_PORT));
+        System.setProperty(DB_HOST.getEnvironment(), "localhost");
+        System.setProperty(DB_PORT.getEnvironment(), "5432");
+        System.setProperty(DB_DATABASE.getEnvironment(), "broker");
+        System.setProperty(DB_USER.getEnvironment(), "username");
+        System.setProperty(DB_PASSWORD.getEnvironment(), "password");
         LOG.warn("!!! Tests are using local database !!!");
         vertx.deployVerticle(new Application(), context.succeeding(id -> context.completeNow()));
     }

@@ -8,7 +8,7 @@
 # Alternative https://hub.docker.com/_/amazoncorretto
 FROM amazoncorretto:17-alpine-jdk
 
-ENV FAT_JAR stock-broker-1.0-SNAPSHOT-fat.jar
+ENV FAT_JAR stock-broker-*-fat.jar
 ENV APP_HOME /usr/app
 
 EXPOSE 8888
