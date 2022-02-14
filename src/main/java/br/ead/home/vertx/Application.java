@@ -7,15 +7,23 @@ import br.ead.home.vertx.verticles.VersionInfoVerticle;
 import io.vertx.core.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 @Slf4j
 public class Application extends AbstractVerticle {
 
     public static void main(String[] args) {
+        var start = LocalDateTime.now();
         var vertx = Vertx.vertx();
         vertx.exceptionHandler(error -> log.error("Unhandled error: {}", error.getMessage(), error));
         vertx.deployVerticle(new Application())
                 .onFailure(error -> log.error("Failed to deploy:", error))
-                .onSuccess(id -> log.info("Deployed {} with id {}", Application.class.getSimpleName(), id));
+                .onSuccess(id -> {
+                    var end = LocalDateTime.now();
+                    var timeElapsed = ChronoUnit.MILLIS.between(start, end);
+                    log.info("Deployed {} with id {} in {} milliseconds", Application.class.getSimpleName(), id, timeElapsed);
+                });
     }
 
     @Override
