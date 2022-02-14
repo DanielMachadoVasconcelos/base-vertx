@@ -10,6 +10,7 @@ plugins {
 
 group 'br.ead.home.vertx'
 version '1.0-SNAPSHOT'
+sourceCompatibility = '17'
 
 def mainVerticleName = "br.ead.home.vertx.Application"
 def watchForChange = "src/**/*"
@@ -28,6 +29,7 @@ dockerCompose {
     stopContainers = true
     removeContainers = true
     removeOrphans = true
+    forceRecreate = true
 }
 
 application {
