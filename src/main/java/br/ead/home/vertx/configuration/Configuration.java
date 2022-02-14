@@ -38,7 +38,7 @@ public class Configuration {
         var host = DB_HOST.extract(config);
         var database = DB_DATABASE.extract(config);
         var user = DB_USER.extract(config);
-        var password = DB_HOST.extract(config);
+        var password = DB_PASSWORD.extract(config);
 
         Preconditions.checkNotNull(dbConfiguration, "database is not configured in configuration file!");
         Preconditions.checkNotNull(password, "database password is not configured in configuration file!");
