@@ -2,18 +2,23 @@ version: '3.7'
 
 services:
   db:
-    image: postgres:13.1-alpine
+    image: postgres:11.9
     container_name: database
     environment:
-      # Create db
-      POSTGRES_DB: 'broker'
-      POSTGRES_USER: 'username'
-      POSTGRES_PASSWORD: 'password'
-      TZ: UTC
+      - "POSTGRES_USER=username"
+      - "POSTGRES_PASSWORD=password"
+      - "POSTGRES_DB=broker"
+    networks:
+      - integration-test
     volumes:
       - vertx-stock-broker-data-local:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -h postgres -p 5432 -U user -d password']
+      interval: 1s
+      timeout: 1s
+      retries: 10
 
 #  pgadmin:
 #    container_name: pgadmin4
@@ -29,3 +34,8 @@ services:
 # > docker volume rm postgres_vertx-stock-broker-data-local
 volumes:
   vertx-stock-broker-data-local:
+
+networks:
+  integration-test:
+    driver: bridge
+    name: integration-test
