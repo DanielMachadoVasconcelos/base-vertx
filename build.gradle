@@ -56,13 +56,15 @@ configurations {
 
 dependencies {
 
-    implementation 'io.vertx:vertx-web:4.2.3'
-    implementation 'io.vertx:vertx-web-client:4.2.3'
-    implementation 'io.vertx:vertx-core:4.2.3'
-    implementation 'io.vertx:vertx-config:4.2.3'
-    implementation 'io.vertx:vertx-config-yaml:4.2.3'
-    implementation 'io.vertx:vertx-pg-client:4.2.3'
-    implementation 'io.vertx:vertx-sql-client-templates:4.2.3'
+    implementation 'io.vertx:vertx-web:4.2.4'
+    implementation 'io.vertx:vertx-web-client:4.2.4'
+    implementation 'io.vertx:vertx-core:4.2.4'
+    implementation 'io.vertx:vertx-config:4.2.4'
+    implementation 'io.vertx:vertx-config-yaml:4.2.4'
+    implementation 'io.vertx:vertx-pg-client:4.2.4'
+    implementation 'io.vertx:vertx-sql-client-templates:4.2.4'
+    implementation 'com.ongres.scram:client:2.1'
+
     implementation 'org.flywaydb:flyway-core:8.3.0'
     implementation 'org.postgresql:postgresql:42.3.1'
 

@@ -29,27 +29,28 @@ class WatchListRestApiTest extends AbstractRestApiTest {
         var client = webClient(vertx);
         var accountId = UUID.randomUUID();
         client.put("/account/watchlist/" + accountId)
-                .sendJsonObject(body())
-                .onFailure(context::failNow)
-                .onComplete(context.succeeding(response -> {
+              .sendJsonObject(body())
+              .onFailure(context::failNow)
+              .onComplete(context.succeeding(response -> {
                     var json = response.bodyAsJsonObject();
                     LOG.info("Response PUT: {}", json);
                     assertEquals(204, response.statusCode());
-                }))
-                .compose(next -> {
-                    client.get("/account/watchlist/" + accountId)
-                            .send()
-                            .onFailure(context::failNow)
-                            .onComplete(context.succeeding(response -> {
-                                var json = response.bodyAsJsonArray();
-                                LOG.info("Response GET: {}", json);
-                                assertEquals("[{\"asset\":\"AMZN\"},{\"asset\":\"TSLA\"}]", json.encode());
-                                assertEquals(200, response.statusCode());
-                                context.completeNow();
-                            }));
-                    return Future.succeededFuture();
-                })
-                .onFailure(context::failNow);
+              }))
+              .compose(next -> {
+                client.get("/account/watchlist/" + accountId)
+                        .send()
+                        .onFailure(context::failNow)
+                        .onComplete(context.succeeding(response -> {
+                            var json = response.bodyAsJsonArray();
+                            LOG.info("Response GET: {}", json);
+                            assertEquals("[{\"asset\":\"AMZN\"},{\"asset\":\"TSLA\"}]", json.encode());
+                            assertEquals(200, response.statusCode());
+                            context.completeNow();
+                        }));
+                return Future.succeededFuture();
+            })
+            .onFailure(context::failNow)
+            .onSuccess(any -> context.completeNow());
     }
 
     private JsonObject body() {

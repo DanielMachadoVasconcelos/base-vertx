@@ -51,7 +51,7 @@ public class PutWatchListHandler implements Handler<RoutingContext> {
                     .compose(deletionDone -> addAllForAccountId(client, context, parameterBatch))
                     .onFailure(DataBaseResponseHandler.errorHandler(context, "Failed to update watchlist for accountId: " + accountId))
                     .onSuccess(result -> context.response().setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end(json.toBuffer()))
-        );
+        ).onFailure(DataBaseResponseHandler.errorHandler(context, "Failed to update watchlist for accountId: " + accountId));
     }
 
     private Future<SqlResult<Void>> addAllForAccountId(final SqlConnection client,
